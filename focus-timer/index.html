@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Focus — Productivity Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0c0e;
+      --surface: #141416;
+      --border: #242428;
+      --text: #e8e4dc;
+      --muted: #5a5a62;
+      --accent-work: #e8c97a;
+      --accent-break: #7ac4e8;
+      --accent-long: #a07ae8;
+      --ring-track: #1e1e22;
+      --font-display: 'Fraunces', serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Subtle grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* Ambient glow that shifts with mode */
+    .ambient {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.07;
+      pointer-events: none;
+      transition: background 1.2s ease;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Layout */
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      z-index: 1;
+      width: 100%;
+      max-width: 460px;
+      padding: 2rem;
+    }
+
+    /* Header */
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 3.5rem;
+    }
+
+    .brand {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+    }
+
+    .session-count {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .session-dots {
+      display: flex;
+      gap: 5px;
+      margin-top: 4px;
+      justify-content: flex-end;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      transition: all 0.4s ease;
+    }
+
+    .dot.filled {
+      border-color: var(--accent-work);
+      background: var(--accent-work);
+      box-shadow: 0 0 6px var(--accent-work);
+    }
+
+    /* Mode tabs */
+    .mode-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 3rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .tab {
+      padding: 0.5rem 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+
+    .tab:last-child { border-right: none; }
+
+    .tab.active {
+      color: var(--bg);
+      font-weight: 500;
+    }
+
+    .tab.active[data-mode="work"]   { background: var(--accent-work); }
+    .tab.active[data-mode="break"]  { background: var(--accent-break); }
+    .tab.active[data-mode="long"]   { background: var(--accent-long); }
+
+    /* Ring timer */
+    .ring-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin-bottom: 3rem;
+    }
+
+    .ring-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring-track {
+      fill: none;
+      stroke: var(--ring-track);
+      stroke-width: 3;
+    }
+
+    .ring-progress {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s linear, stroke 1.2s ease;
+    }
+
+    .ring-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .time-display {
+      font-family: var(--font-display);
+      font-size: 4.2rem;
+      font-weight: 200;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      transition: color 1.2s ease;
+    }
+
+    .time-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .btn-main {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-main::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-main:hover::after { opacity: 0.06; }
+    .btn-main:active::after { opacity: 0.12; }
+
+    .btn-main.playing {
+      border-color: var(--accent-work);
+      box-shadow: 0 0 0 1px var(--accent-work), 0 0 24px rgba(232,201,122,0.15);
+    }
+
+    .btn-secondary {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
+    svg.icon { pointer-events: none; }
+
+    /* Stats bar */
+    .stats {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr 1px 1fr;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .stat-divider {
+      background: var(--border);
+    }
+
+    .stat {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 300;
+      margin-bottom: 3px;
+    }
+
+    .stat-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Keyboard hint */
+    .hint {
+      margin-top: 2rem;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+
+    kbd {
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+    }
+
+    /* Finish flash */
+    @keyframes flash-bg {
+      0%   { opacity: 0; }
+      20%  { opacity: 0.12; }
+      100% { opacity: 0; }
+    }
+
+    .flash-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99;
+      opacity: 0;
+    }
+
+    .flash-overlay.flash {
+      animation: flash-bg 1.2s ease forwards;
+    }
+
+    /* Tick animation */
+    @keyframes tick-pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.015); }
+      100% { transform: scale(1); }
+    }
+
+    .time-display.tick { animation: tick-pulse 0.12s ease; }
+  </style>
+</head>
+<body>
+
+<div class="ambient" id="ambient"></div>
+<div class="flash-overlay" id="flashOverlay"></div>
+
+<div class="wrapper">
+
+  <header class="header">
+    <span class="brand">focus.</span>
+    <div style="text-align:right">
+      <div class="session-count" id="sessionLabel">0 pomodoros today</div>
+      <div class="session-dots" id="sessionDots"></div>
+    </div>
+  </header>
+
+  <nav class="mode-tabs">
+    <button class="tab active" data-mode="work"  onclick="setMode('work')">Focus</button>
+    <button class="tab"        data-mode="break" onclick="setMode('break')">Break</button>
+    <button class="tab"        data-mode="long"  onclick="setMode('long')">Long</button>
+  </nav>
+
+  <div class="ring-container">
+    <svg class="ring-svg" viewBox="0 0 280 280" id="ringSvg">
+      <circle class="ring-track"    cx="140" cy="140" r="126"/>
+      <circle class="ring-progress" cx="140" cy="140" r="126" id="ringProgress"/>
+    </svg>
+    <div class="ring-inner">
+      <div class="time-display" id="timeDisplay">25:00</div>
+      <div class="time-label"   id="modeLabel">focus session</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-secondary" onclick="resetTimer()" title="Reset">
+      <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+      </svg>
+    </button>
+
+    <button class="btn-main" id="mainBtn" onclick="toggleTimer()">
+      <svg class="icon" id="playIcon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="5,3 19,12 5,21"/>
+      </svg>
+      <svg class="icon" id="pauseIcon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+        <rect x="6" y="4" width="4" height="16" rx="1"/>
+        <rect x="14" y="4" width="4" height="16" rx="1"/>
+      </svg>
+    </button>
+
+    <button class="btn-secondary" onclick="skipSession()" title="Skip">
+      <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5,4 15,12 5,20"/>
+        <line x1="19" y1="5" x2="19" y2="19"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="statPomodoros">0</div>
+      <div class="stat-label">sessions</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value" id="statFocus">0m</div>
+      <div class="stat-label">focused</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value" id="statStreak">0</div>
+      <div class="stat-label">streak</div>
+    </div>
+  </div>
+
+  <p class="hint"><kbd>Space</kbd> play/pause &nbsp;·&nbsp; <kbd>R</kbd> reset &nbsp;·&nbsp; <kbd>S</kbd> skip</p>
+
+</div>
+
+<script>
+  // ── Config ──────────────────────────────────────────────────────────────
+  const MODES = {
+    work:  { label: 'focus session',  minutes: 25, accent: '#e8c97a', ambientColor: '#e8c97a' },
+    break: { label: 'short break',    minutes:  5, accent: '#7ac4e8', ambientColor: '#7ac4e8' },
+    long:  { label: 'long break',     minutes: 15, accent: '#a07ae8', ambientColor: '#a07ae8' },
+  };
+
+  // ── State ────────────────────────────────────────────────────────────────
+  let mode        = 'work';
+  let totalSecs   = MODES.work.minutes * 60;
+  let remaining   = totalSecs;
+  let running     = false;
+  let interval    = null;
+  let sessions    = 0;
+  let focusMinutes = 0;
+  let streak      = 0;
+  let lastSession = null;
+
+  // ── DOM refs ─────────────────────────────────────────────────────────────
+  const timeDisplay  = document.getElementById('timeDisplay');
+  const modeLabel    = document.getElementById('modeLabel');
+  const ringProgress = document.getElementById('ringProgress');
+  const mainBtn      = document.getElementById('mainBtn');
+  const playIcon     = document.getElementById('playIcon');
+  const pauseIcon    = document.getElementById('pauseIcon');
+  const ambient      = document.getElementById('ambient');
+  const flash        = document.getElementById('flashOverlay');
+
+  // ── Ring setup ────────────────────────────────────────────────────────────
+  const R = 126;
+  const CIRC = 2 * Math.PI * R;
+  ringProgress.style.strokeDasharray  = CIRC;
+  ringProgress.style.strokeDashoffset = 0;
+
+  function updateRing() {
+    const pct = remaining / totalSecs;
+    ringProgress.style.strokeDashoffset = CIRC * (1 - pct);
+  }
+
+  // ── Audio (Web Audio API) ─────────────────────────────────────────────────
+  let audioCtx;
+  function ensureAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function beep(freq = 440, type = 'sine', duration = 0.15, gain = 0.25) {
+    ensureAudio();
+    const osc = audioCtx.createOscillator();
+    const g   = audioCtx.createGain();
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.type = type;
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(gain, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+  }
+
+  function playFinish() {
+    [0, 0.18, 0.36].forEach((t, i) => {
+      setTimeout(() => beep([660, 784, 988][i], 'sine', 0.3, 0.3), t * 1000);
+    });
+  }
+
+  function playTick() {
+    beep(1200, 'square', 0.03, 0.04);
+  }
+
+  // ── Format ────────────────────────────────────────────────────────────────
+  function fmt(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  function render() {
+    timeDisplay.textContent = fmt(remaining);
+    document.title = `${fmt(remaining)} — focus.`;
+    updateRing();
+  }
+
+  function applyMode() {
+    const m = MODES[mode];
+    totalSecs = m.minutes * 60;
+    remaining = totalSecs;
+    modeLabel.textContent = m.label;
+    ringProgress.style.stroke = m.accent;
+    ambient.style.background  = m.ambientColor;
+    timeDisplay.style.color   = m.accent;
+    flash.style.background    = m.ambientColor;
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.mode === mode);
+    });
+
+    mainBtn.classList.remove('playing');
+    playIcon.style.display  = '';
+    pauseIcon.style.display = 'none';
+    render();
+  }
+
+  // ── Controls ─────────────────────────────────────────────────────────────
+  function setMode(m) {
+    if (running) stopTimer();
+    mode = m;
+    applyMode();
+  }
+
+  function toggleTimer() {
+    ensureAudio();
+    running ? pauseTimer() : startTimer();
+  }
+
+  function startTimer() {
+    running = true;
+    mainBtn.classList.add('playing');
+    playIcon.style.display  = 'none';
+    pauseIcon.style.display = '';
+    interval = setInterval(tick, 1000);
+  }
+
+  function pauseTimer() {
+    running = false;
+    mainBtn.classList.remove('playing');
+    playIcon.style.display  = '';
+    pauseIcon.style.display = 'none';
+    clearInterval(interval);
+  }
+
+  function stopTimer() {
+    pauseTimer();
+  }
+
+  function resetTimer() {
+    stopTimer();
+    remaining = totalSecs;
+    render();
+  }
+
+  function skipSession() {
+    stopTimer();
+    finishSession(false);
+  }
+
+  function tick() {
+    remaining--;
+    if (remaining <= 0) {
+      remaining = 0;
+      render();
+      finishSession(true);
+      return;
+    }
+    // Tick sound in last 5 seconds
+    if (remaining <= 5) playTick();
+    render();
+
+    // Animate time display
+    timeDisplay.classList.remove('tick');
+    void timeDisplay.offsetWidth;
+    timeDisplay.classList.add('tick');
+  }
+
+  function finishSession(natural) {
+    stopTimer();
+    if (natural && mode === 'work') {
+      sessions++;
+      focusMinutes += MODES.work.minutes;
+      updateStreak();
+      updateStats();
+      updateDots();
+      playFinish();
+      triggerFlash();
+    }
+    // Auto-switch mode
+    if (natural) {
+      if (mode === 'work') {
+        setMode(sessions % 4 === 0 ? 'long' : 'break');
+      } else {
+        setMode('work');
+      }
+    }
+  }
+
+  function updateStreak() {
+    const today = new Date().toDateString();
+    if (lastSession === today) {
+      streak++;
+    } else if (lastSession !== new Date(Date.now() - 86400000).toDateString()) {
+      streak = 1;
+    }
+    lastSession = today;
+  }
+
+  function triggerFlash() {
+    flash.classList.remove('flash');
+    void flash.offsetWidth;
+    flash.classList.add('flash');
+  }
+
+  // ── Stats UI ──────────────────────────────────────────────────────────────
+  function updateStats() {
+    document.getElementById('statPomodoros').textContent = sessions;
+    document.getElementById('statFocus').textContent     = focusMinutes + 'm';
+    document.getElementById('statStreak').textContent    = streak;
+  }
+
+  function updateDots() {
+    const container = document.getElementById('sessionDots');
+    const label     = document.getElementById('sessionLabel');
+    label.textContent = `${sessions} pomodoro${sessions !== 1 ? 's' : ''} today`;
+    container.innerHTML = '';
+    const cycle = sessions % 4 || (sessions > 0 ? 4 : 0);
+    for (let i = 0; i < 4; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i < cycle ? ' filled' : '');
+      container.appendChild(d);
+    }
+  }
+
+  // ── Keyboard ──────────────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.code === 'Space') { e.preventDefault(); toggleTimer(); }
+    if (e.key  === 'r' || e.key === 'R') resetTimer();
+    if (e.key  === 's' || e.key === 'S') skipSession();
+  });
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+  applyMode();
+  updateDots();
+</script>
+</body>
+</html>
