@@ -440,13 +440,6 @@
     document.body.classList.remove('pulse');
     void document.body.offsetWidth;
     document.body.classList.add('pulse');
-
-    // Auto-switch
-    if (mode === 'focus') {
-      setMode(sessionCount % 4 === 0 ? 'long' : 'break');
-    } else {
-      setMode('focus');
-    }
   }
 
   // ── Events ──
