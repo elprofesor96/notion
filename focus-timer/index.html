@@ -67,14 +67,19 @@
     /* Mode tabs */
     .modes {
       display: flex;
-      gap: 0;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 1.5rem;
+    }
+
+    .mode-group {
+      display: flex;
       border: 1px solid var(--border);
       border-radius: 4px;
       overflow: hidden;
     }
 
-    .modes button {
+    .mode-group button {
       padding: 0.45rem 1rem;
       font-family: var(--font);
       font-size: 0.65rem;
@@ -88,12 +93,20 @@
       transition: all 0.25s ease;
     }
 
-    .modes button:last-child { border-right: none; }
+    .mode-group button:last-child { border-right: none; }
 
-    .modes button.active {
+    .mode-group button.active {
       color: var(--bg);
       font-weight: 500;
       background: var(--accent);
+    }
+
+    .modes-sep {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--muted);
+      opacity: 0.5;
     }
 
     /* Sessions counter */
@@ -225,10 +238,15 @@
 <div class="container" data-mode="focus">
 
   <nav class="modes">
-    <button class="active" data-mode="focus">Focus</button>
-    <button data-mode="break">Break</button>
-    <button data-mode="long">Long</button>
-    <button data-mode="deep">Deep</button>
+    <div class="mode-group">
+      <button class="active" data-mode="focus">Focus</button>
+      <button data-mode="deep">Deep</button>
+    </div>
+    <div class="modes-sep"></div>
+    <div class="mode-group">
+      <button data-mode="break">Break</button>
+      <button data-mode="long">Long</button>
+    </div>
   </nav>
 
   <span class="sessions">0 sessions</span>
