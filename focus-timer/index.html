@@ -311,25 +311,6 @@
   var sessionCount = 0;
   var audioCtx = null;
 
-  // ── localStorage ──
-  function loadSessions() {
-    try {
-      var data = JSON.parse(localStorage.getItem('focus-timer'));
-      if (data && data.date === new Date().toDateString()) {
-        sessionCount = data.count || 0;
-      }
-    } catch (e) { /* silently fail in iframe */ }
-  }
-
-  function saveSessions() {
-    try {
-      localStorage.setItem('focus-timer', JSON.stringify({
-        count: sessionCount,
-        date: new Date().toDateString(),
-      }));
-    } catch (e) { /* silently fail */ }
-  }
-
   // ── Audio ──
   function ensureAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -443,7 +424,6 @@
     pause();
     if (mode === 'focus') {
       sessionCount++;
-      saveSessions();
       chime();
     }
     // Body pulse
@@ -470,7 +450,6 @@
   });
 
   // ── Init ──
-  loadSessions();
   applyAccent();
   render();
 })();
