@@ -151,12 +151,6 @@
       transition: color 0.4s ease, opacity 0.3s ease;
     }
 
-    .label {
-      font-size: 0.6rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text);
-    }
 
     /* Controls */
     .controls {
@@ -243,7 +237,6 @@
     </svg>
     <div class="ring-inner">
       <div class="time">25:00</div>
-      <div class="label">focus session</div>
     </div>
   </div>
 
@@ -284,7 +277,6 @@
   // ── DOM ──
   var container  = document.querySelector('.container');
   var timeEl     = container.querySelector('.time');
-  var labelEl    = container.querySelector('.label');
   var sessionsEl = container.querySelector('.sessions');
   var ring       = container.querySelector('.ring-progress');
   var playBtn    = container.querySelector('.btn-play');
@@ -360,7 +352,6 @@
     container.setAttribute('data-mode', mode);
     totalSecs = MODES[mode].minutes * 60;
     remaining = totalSecs;
-    labelEl.textContent = MODES[mode].label;
     applyAccent();
 
     // Update active tab
