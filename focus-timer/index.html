@@ -17,6 +17,7 @@
       --accent-focus: #c4943a;
       --accent-break: #4a9ebb;
       --accent-long: #7a5abb;
+      --accent-deep: #bb4a4a;
       --ring-track: #eae8e3;
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     }
@@ -32,6 +33,7 @@
         --accent-focus: #e8c97a;
         --accent-break: #7ac4e8;
         --accent-long: #a07ae8;
+        --accent-deep: #e87a7a;
         --ring-track: #1e1e22;
       }
     }
@@ -226,6 +228,7 @@
     <button class="active" data-mode="focus">Focus</button>
     <button data-mode="break">Break</button>
     <button data-mode="long">Long</button>
+    <button data-mode="deep">Deep</button>
   </nav>
 
   <span class="sessions">0 sessions</span>
@@ -272,6 +275,7 @@
     focus: { label: 'focus session', minutes: 25, accent: '--accent-focus' },
     break: { label: 'short break',  minutes: 5,  accent: '--accent-break' },
     long:  { label: 'long break',   minutes: 15, accent: '--accent-long'  },
+    deep:  { label: 'long focus',   minutes: 60, accent: '--accent-deep'  },
   };
 
   // ── DOM ──
