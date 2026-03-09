@@ -1,8 +1,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #faf9f6;
-  --surface: #ffffff;
+  --bg: transparent;
+  --surface: rgba(0, 0, 0, 0.03);
   --border: #e2e0db;
   --text: #1a1a1a;
   --muted: #8a8a8e;
@@ -17,8 +17,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0c0c0e;
-    --surface: #141416;
+    --bg: transparent;
+    --surface: rgba(255, 255, 255, 0.05);
     --border: #242428;
     --text: #ffffff;
     --muted: #5a5a62;
@@ -208,9 +208,9 @@ svg.icon { pointer-events: none; }
 
 /* Completion pulse */
 @keyframes bg-pulse {
-  0%   { background-color: var(--bg); }
-  50%  { background-color: var(--surface); }
-  100% { background-color: var(--bg); }
+  0%   { opacity: 1; }
+  50%  { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 
 body.pulse { animation: bg-pulse 0.8s ease; }
