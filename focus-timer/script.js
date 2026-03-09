@@ -1,6 +1,11 @@
 ;(function () {
   'use strict';
 
+  // ── Theme ──
+  if (new URLSearchParams(window.location.search).get('theme') === 'light') {
+    document.documentElement.classList.add('light');
+  }
+
   // ── Config ──
   var MODES = {
     focus: { label: 'focus session', minutes: 25, accent: '--accent-focus' },

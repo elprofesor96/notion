@@ -1,7 +1,26 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Dark theme (default) */
 :root {
   --bg: transparent;
+  --html-bg: #191919;
+  --surface: rgba(255, 255, 255, 0.05);
+  --border: #242428;
+  --text: #ffffff;
+  --muted: #5a5a62;
+  --accent: #e8c97a;
+  --accent-focus: #e8c97a;
+  --accent-break: #7ac4e8;
+  --accent-long: #a07ae8;
+  --accent-deep: #e87a7a;
+  --ring-track: #1e1e22;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Light theme via ?theme=light */
+:root.light {
+  --bg: transparent;
+  --html-bg: #ffffff;
   --surface: rgba(0, 0, 0, 0.03);
   --border: #e2e0db;
   --text: #1a1a1a;
@@ -12,24 +31,9 @@
   --accent-long: #7a5abb;
   --accent-deep: #bb4a4a;
   --ring-track: #eae8e3;
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: transparent;
-    --surface: rgba(255, 255, 255, 0.05);
-    --border: #242428;
-    --text: #ffffff;
-    --muted: #5a5a62;
-    --accent: #e8c97a;
-    --accent-focus: #e8c97a;
-    --accent-break: #7ac4e8;
-    --accent-long: #a07ae8;
-    --accent-deep: #e87a7a;
-    --ring-track: #1e1e22;
-  }
-}
+html { background: var(--html-bg); }
 
 body {
   background: var(--bg);
@@ -89,9 +93,13 @@ body {
 .mode-group button:last-child { border-right: none; }
 
 .mode-group button.active {
-  color: var(--bg);
+  color: #0c0c0e;
   font-weight: 500;
   background: var(--accent);
+}
+
+:root.light .mode-group button.active {
+  color: #ffffff;
 }
 
 .modes-sep {
