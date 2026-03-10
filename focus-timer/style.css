@@ -110,15 +110,6 @@ body {
   opacity: 0.5;
 }
 
-/* Sessions counter */
-.sessions {
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text);
-  margin-bottom: 1.5rem;
-}
-
 /* Ring */
 .ring {
   position: relative;

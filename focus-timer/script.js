@@ -17,7 +17,6 @@
   // ── DOM ──
   var container  = document.querySelector('.container');
   var timeEl     = container.querySelector('.time');
-  var sessionsEl = container.querySelector('.sessions');
   var ring       = container.querySelector('.ring-progress');
   var playBtn    = container.querySelector('.btn-play');
   var playIcon   = container.querySelector('.play-icon');
@@ -37,7 +36,6 @@
   var remaining = totalSecs;
   var running = false;
   var interval = null;
-  var sessionCount = 0;
   var audioCtx = null;
 
   // ── Audio ──
@@ -76,7 +74,6 @@
     document.title = formatTime(remaining) + ' \u2014 Focus Timer';
     var pct = remaining / totalSecs;
     ring.style.strokeDashoffset = CIRC * (1 - pct);
-    sessionsEl.textContent = sessionCount + ' session' + (sessionCount !== 1 ? 's' : '');
   }
 
   function applyAccent() {
@@ -150,10 +147,7 @@
 
   function complete() {
     pause();
-    if (mode === 'focus') {
-      sessionCount++;
-      chime();
-    }
+    chime();
     // Body pulse
     document.body.classList.remove('pulse');
     void document.body.offsetWidth;
