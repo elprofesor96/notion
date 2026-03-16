@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Wins</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <div class="counter">
+    <span class="counter-done">0</span>
+    <span class="counter-sep"> / </span>
+    <span class="counter-total">0</span>
+    <span class="counter-label">wins</span>
+  </div>
+
+  <div class="input-row">
+    <input type="text" class="win-input" placeholder="Add a win for today..." maxlength="80" />
+    <button class="btn-add" aria-label="Add win">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+    </button>
+  </div>
+
+  <ul class="win-list"></ul>
+
+  <div class="celebration">
+    <span class="celebration-text">All wins done!</span>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

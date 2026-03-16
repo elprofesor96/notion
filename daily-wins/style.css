@@ -1,0 +1,330 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Dark theme (default) */
+:root {
+  --bg: transparent;
+  --html-bg: #191919;
+  --surface: rgba(255, 255, 255, 0.05);
+  --border: #242428;
+  --text: #ffffff;
+  --muted: #5a5a62;
+  --accent: #e8c97a;
+  --danger: #e87a7a;
+  --done-opacity: 0.4;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Light theme via ?theme=light */
+:root.light {
+  --bg: transparent;
+  --html-bg: #ffffff;
+  --surface: rgba(0, 0, 0, 0.03);
+  --border: #e2e0db;
+  --text: #1a1a1a;
+  --muted: #8a8a8e;
+  --accent: #c4943a;
+  --danger: #bb4a4a;
+}
+
+html { background: var(--html-bg); }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 3rem;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  animation: fade-in 0.5s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Counter ── */
+.counter {
+  margin-bottom: 1.8rem;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.counter-done {
+  font-size: 3.2rem;
+  font-weight: 200;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+  transition: color 0.3s ease;
+}
+
+.counter-sep,
+.counter-total {
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--muted);
+}
+
+.counter-label {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-left: 6px;
+}
+
+@keyframes bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.counter-done.bump {
+  animation: bump 0.3s ease;
+}
+
+/* ── Input row ── */
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.win-input {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 0;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.win-input::placeholder {
+  color: var(--muted);
+}
+
+.win-input:focus {
+  border-bottom-color: var(--accent);
+}
+
+.win-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-add {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.btn-add:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-add:active {
+  transform: scale(0.95);
+}
+
+.btn-add:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.btn-add svg { pointer-events: none; }
+
+/* ── Win list ── */
+.win-list {
+  list-style: none;
+  width: 100%;
+}
+
+.win-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+  animation: item-in 0.25s ease;
+  transition: opacity 0.3s ease;
+}
+
+.win-item.done {
+  opacity: var(--done-opacity);
+}
+
+@keyframes item-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes item-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(30px); }
+}
+
+.win-item.removing {
+  animation: item-out 0.2s ease forwards;
+}
+
+/* ── Custom SVG checkbox ── */
+.win-check {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.win-check svg {
+  pointer-events: none;
+}
+
+.check-box {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  transition: fill 0.25s ease, stroke 0.25s ease;
+}
+
+.check-mark {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition: stroke-dashoffset 0.3s ease, stroke 0.25s ease;
+}
+
+.win-item.done .check-box {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.win-item.done .check-mark {
+  stroke-dashoffset: 0;
+  stroke: var(--html-bg);
+}
+
+/* ── Win text ── */
+.win-text {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  transition: text-decoration-color 0.3s ease;
+}
+
+.win-item.done .win-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--muted);
+}
+
+/* ── Delete button ── */
+.win-delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.win-item:hover .win-delete {
+  opacity: 1;
+}
+
+.win-delete:hover {
+  color: var(--danger);
+}
+
+@media (hover: none) {
+  .win-delete {
+    opacity: 0.5;
+  }
+}
+
+/* ── Celebration overlay ── */
+.celebration {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.celebration.active {
+  animation: celebrate-in 2.5s ease forwards;
+  pointer-events: auto;
+}
+
+@keyframes celebrate-in {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.celebration-text {
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+  0%   { transform: scale(0.7); opacity: 0; }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 300px) {
+  .counter-done { font-size: 2.6rem; }
+  .container { padding: 1rem; }
+  body { padding-top: 1.5rem; }
+}
