@@ -270,26 +270,6 @@ body {
   100% { stroke-width: 1; opacity: 0; r: 18; }
 }
 
-/* Row flash on check */
-.win-item.just-checked {
-  animation: row-flash 0.5s ease;
-}
-
-@keyframes row-flash {
-  0%   { background: transparent; }
-  30%  { background: rgba(232, 201, 122, 0.08); }
-  100% { background: transparent; }
-}
-
-:root.light .win-item.just-checked {
-  animation: row-flash-light 0.5s ease;
-}
-
-@keyframes row-flash-light {
-  0%   { background: transparent; }
-  30%  { background: rgba(196, 148, 58, 0.08); }
-  100% { background: transparent; }
-}
 
 /* Confetti particle (JS-spawned) */
 .confetti-particle {
