@@ -224,8 +224,8 @@
     var el = list.querySelector('[data-id="' + id + '"]');
     if (el) {
       el.classList.add('removing');
-      el.addEventListener('animationend', function () {
-        el.remove();
+      el.addEventListener('animationend', function (e) {
+        if (e.animationName === 'item-out') el.remove();
       });
     }
     // Defer counter update slightly so animation plays first
