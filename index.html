@@ -30,11 +30,12 @@
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
     </button>
+    <p class="hint">Match your Notion theme, then copy the embed URL</p>
   </header>
 
   <main class="catalogue">
 
-    <a href="/focus-timer/" class="card">
+    <div class="card" data-path="/focus-timer/">
       <div class="card-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/>
@@ -50,14 +51,27 @@
           <span class="tag">Audio</span>
         </div>
       </div>
-      <span class="card-arrow">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9,18 15,12 9,6"/>
-        </svg>
-      </span>
-    </a>
+      <div class="card-actions">
+        <a href="/focus-timer/" class="btn-action btn-preview" aria-label="Preview widget" data-path="/focus-timer/" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15,3 21,3 21,9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </a>
+        <button class="btn-action btn-copy" aria-label="Copy embed URL" data-path="/focus-timer/">
+          <svg class="icon-clipboard" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="4" rx="1"/>
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+          </svg>
+          <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <polyline points="20,6 9,17 4,12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
-    <a href="/daily-wins/" class="card">
+    <div class="card" data-path="/daily-wins/">
       <div class="card-icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="4"/>
@@ -73,12 +87,25 @@
           <span class="tag">Persistent</span>
         </div>
       </div>
-      <span class="card-arrow">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9,18 15,12 9,6"/>
-        </svg>
-      </span>
-    </a>
+      <div class="card-actions">
+        <a href="/daily-wins/" class="btn-action btn-preview" aria-label="Preview widget" data-path="/daily-wins/" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15,3 21,3 21,9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </a>
+        <button class="btn-action btn-copy" aria-label="Copy embed URL" data-path="/daily-wins/">
+          <svg class="icon-clipboard" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="4" rx="1"/>
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+          </svg>
+          <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <polyline points="20,6 9,17 4,12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
 
   </main>
 
