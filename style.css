@@ -210,6 +210,14 @@ body {
 .footer-link:hover { color: var(--text); }
 .footer-link svg { pointer-events: none; }
 
+.footer-copy {
+  margin-top: 0.8rem;
+  font-size: 0.6rem;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
 /* ── Animation ── */
 
 @keyframes fade-in {

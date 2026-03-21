@@ -19,4 +19,7 @@
   btn.addEventListener('click', function () {
     applyTheme(!document.documentElement.classList.contains('light'));
   });
+
+  var yearEl = document.querySelector('.footer-year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 })();
