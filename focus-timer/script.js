@@ -30,6 +30,31 @@
   ring.style.strokeDasharray = CIRC;
   ring.style.strokeDashoffset = 0;
 
+  // ── Persistence ──
+  var STORAGE_KEY = 'focus-timer-state';
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        mode: mode,
+        remaining: remaining,
+        running: running,
+        timestamp: Date.now()
+      }));
+    } catch (e) { /* private browsing */ }
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function clearState() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* private browsing */ }
+  }
+
   // ── State ──
   var mode = 'focus';
   var totalSecs = MODES.focus.minutes * 60;
@@ -40,7 +65,9 @@
 
   // ── Audio ──
   function ensureAudio() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) { /* blocked without user gesture */ }
   }
 
   function chime() {
@@ -104,6 +131,7 @@
     playIcon.style.display = '';
     pauseIcon.style.display = 'none';
     render();
+    saveState();
   }
 
   // ── Timer controls ──
@@ -114,6 +142,7 @@
     playIcon.style.display = 'none';
     pauseIcon.style.display = '';
     interval = setInterval(tick, 1000);
+    saveState();
   }
 
   function pause() {
@@ -122,6 +151,7 @@
     playIcon.style.display = '';
     pauseIcon.style.display = 'none';
     clearInterval(interval);
+    saveState();
   }
 
   function toggle() {
@@ -132,6 +162,7 @@
     pause();
     remaining = totalSecs;
     render();
+    clearState();
   }
 
   function tick() {
@@ -140,9 +171,11 @@
       remaining = 0;
       render();
       complete();
+      clearState();
       return;
     }
     render();
+    saveState();
   }
 
   function complete() {
@@ -153,6 +186,14 @@
     void document.body.offsetWidth;
     document.body.classList.add('pulse');
   }
+
+  // ── Persist on tab close / hide ──
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && running) saveState();
+  });
+  window.addEventListener('beforeunload', function () {
+    if (running) saveState();
+  });
 
   // ── Events ──
   playBtn.addEventListener('click', toggle);
@@ -165,6 +206,29 @@
   });
 
   // ── Init ──
+  var saved = loadState();
+  if (saved && MODES[saved.mode]) {
+    mode = saved.mode;
+    container.setAttribute('data-mode', mode);
+    totalSecs = MODES[mode].minutes * 60;
+    remaining = saved.remaining;
+
+    modeBtns.forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+
+    if (saved.running) {
+      var elapsed = Math.floor((Date.now() - saved.timestamp) / 1000);
+      remaining = Math.max(0, remaining - elapsed);
+      if (remaining > 0) {
+        start();
+      } else {
+        remaining = 0;
+        clearState();
+      }
+    }
+  }
+
   applyAccent();
   render();
 })();
