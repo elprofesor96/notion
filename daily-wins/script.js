@@ -6,6 +6,11 @@
     document.documentElement.classList.add('light');
   }
 
+  // ── Compact mode (auto-detect iframe) ──
+  if (window.self !== window.top) {
+    document.documentElement.classList.add('compact');
+  }
+
   // ── Constants ──
   var STORAGE_KEY = 'dailyWins';
   var MAX_WINS = 10;

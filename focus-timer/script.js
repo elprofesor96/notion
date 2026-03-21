@@ -6,6 +6,11 @@
     document.documentElement.classList.add('light');
   }
 
+  // ── Compact mode (auto-detect iframe) ──
+  if (window.self !== window.top) {
+    document.documentElement.classList.add('compact');
+  }
+
   // ── Config ──
   var MODES = {
     focus: { label: 'focus session', minutes: 25, accent: '--accent-focus' },
